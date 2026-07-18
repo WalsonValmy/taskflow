@@ -292,11 +292,15 @@ function Dashboard() {
           </select>
         </div>
 
-        {/* Task list */}
+       {/* Task list */}
         {loading ? (
           <p className="text-sm text-ink/50 text-center py-8">Loading tasks...</p>
         ) : visibleTasks.length === 0 ? (
-          <p className="text-sm text-ink/50 text-center py-8">No tasks yet. Add one above.</p>
+          <p className="text-sm text-ink/50 text-center py-8">
+            {tasks.length === 0
+              ? 'No tasks yet. Add one above.'
+              : 'No tasks match your search or filter.'}
+          </p>
         ) : (
           <ul className="space-y-2">
             {visibleTasks.map((task) => {
