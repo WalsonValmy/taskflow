@@ -24,7 +24,6 @@ function SignUp() {
     if (error) {
       setError(error.message)
     } else if (data?.user && !data.session) {
-      // Supabase requires email confirmation before a session is created
       setMessage('Check your email to confirm your account before logging in.')
     } else {
       navigate('/dashboard')
@@ -32,39 +31,70 @@ function SignUp() {
   }
 
   return (
-    <div className="auth-page">
-      <h1>Sign Up</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-8">
+          <h1 className="font-display text-3xl font-semibold text-ink">
+            Task<span className="text-brand">Flow</span>
+          </h1>
+          <p className="text-sm text-ink/60 mt-1">Create an account to get started</p>
         </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-          />
-        </div>
-        {error && <p className="error">{error}</p>}
-        {message && <p className="success">{message}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Signing up...' : 'Sign Up'}
-        </button>
-      </form>
-      <p>
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
+
+        <form
+          onSubmit={handleSubmit}
+          className="bg-surface rounded-2xl shadow-sm border border-ink/5 p-6 space-y-4"
+        >
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-ink mb-1">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full rounded-lg border border-ink/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-ink mb-1">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full rounded-lg border border-ink/10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+            />
+          </div>
+
+          {error && (
+            <p className="text-sm text-coral bg-coral/10 rounded-lg px-3 py-2">{error}</p>
+          )}
+          {message && (
+            <p className="text-sm text-success bg-success/10 rounded-lg px-3 py-2">{message}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-brand hover:bg-brand-dark transition-colors text-white font-medium rounded-lg py-2 text-sm disabled:opacity-60"
+          >
+            {loading ? 'Signing up...' : 'Sign Up'}
+          </button>
+        </form>
+
+        <p className="text-center text-sm text-ink/60 mt-6">
+          Already have an account?{' '}
+          <Link to="/login" className="text-brand font-medium hover:underline">
+            Log in
+          </Link>
+        </p>
+      </div>
     </div>
   )
 }
