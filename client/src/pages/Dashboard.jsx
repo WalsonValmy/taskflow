@@ -15,6 +15,11 @@ function Dashboard() {
   const [dueDate, setDueDate] = useState('')
   const [editingId, setEditingId] = useState(null) // null = creating, otherwise editing this task's id
 
+  // Filter / search / sort state
+  const [filter, setFilter] = useState('all') // 'all' | 'active' | 'completed' | 'high'
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('created') // 'created' | 'due_date' | 'priority' | 'alphabetical'
+
   useEffect(() => {
     loadTasks()
   }, [])
@@ -90,6 +95,44 @@ function Dashboard() {
     }
   }
 
+  function getVisibleTasks() {
+    let result = [...tasks]
+
+    // Filter
+    if (filter === 'active') {
+      result = result.filter((t) => !t.completed)
+    } else if (filter === 'completed') {
+      result = result.filter((t) => t.completed)
+    } else if (filter === 'high') {
+      result = result.filter((t) => t.priority === 'high')
+    }
+
+    // Search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      result = result.filter((t) => t.title.toLowerCase().includes(query))
+    }
+
+    // Sort
+    if (sortBy === 'due_date') {
+      result.sort((a, b) => {
+        if (!a.due_date) return 1
+        if (!b.due_date) return -1
+        return new Date(a.due_date) - new Date(b.due_date)
+      })
+    } else if (sortBy === 'priority') {
+      const order = { high: 0, medium: 1, low: 2 }
+      result.sort((a, b) => order[a.priority] - order[b.priority])
+    } else if (sortBy === 'alphabetical') {
+      result.sort((a, b) => a.title.localeCompare(b.title))
+    }
+    // 'created' is already the default order from the API (newest first)
+
+    return result
+  }
+
+  const visibleTasks = getVisibleTasks()
+
   return (
     <div className="dashboard">
       <header>
@@ -131,13 +174,56 @@ function Dashboard() {
 
       {error && <p className="error">{error}</p>}
 
+      <div className="controls">
+        <div className="filter-buttons">
+          <button
+            className={filter === 'all' ? 'active-filter' : ''}
+            onClick={() => setFilter('all')}
+          >
+            All
+          </button>
+          <button
+            className={filter === 'active' ? 'active-filter' : ''}
+            onClick={() => setFilter('active')}
+          >
+            Active
+          </button>
+          <button
+            className={filter === 'completed' ? 'active-filter' : ''}
+            onClick={() => setFilter('completed')}
+          >
+            Completed
+          </button>
+          <button
+            className={filter === 'high' ? 'active-filter' : ''}
+            onClick={() => setFilter('high')}
+          >
+            High Priority
+          </button>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search tasks..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+
+        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+          <option value="created">Newest First</option>
+          <option value="due_date">Due Date</option>
+          <option value="priority">Priority</option>
+          <option value="alphabetical">Alphabetical</option>
+        </select>
+      </div>
+
       {loading ? (
         <p>Loading tasks...</p>
-      ) : tasks.length === 0 ? (
+      ) : visibleTasks.length === 0 ? (
         <p>No tasks yet. Add one above.</p>
       ) : (
         <ul className="task-list">
-          {tasks.map((task) => (
+          {visibleTasks.map((task) => (
             <li key={task.id} className={`priority-${task.priority}`}>
               <input
                 type="checkbox"
