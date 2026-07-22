@@ -51,6 +51,7 @@ function Dashboard() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!title.trim()) return
+    setError('')
 
     const taskData = {
       title,
@@ -81,6 +82,7 @@ function Dashboard() {
   }
 
   async function handleToggle(task) {
+    setError('')
     try {
       await toggleComplete(task.id, !task.completed)
       loadTasks()
@@ -90,6 +92,7 @@ function Dashboard() {
   }
 
   async function handleDelete(id) {
+    setError('')
     try {
       await deleteTask(id)
       if (editingId === id) resetForm()
@@ -292,7 +295,7 @@ function Dashboard() {
           </select>
         </div>
 
-       {/* Task list */}
+        {/* Task list */}
         {loading ? (
           <p className="text-sm text-ink/50 text-center py-8">Loading tasks...</p>
         ) : visibleTasks.length === 0 ? (
